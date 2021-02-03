@@ -239,3 +239,104 @@ class의 경우에는
 멤버함수에다가 method decorator를 사용하여
 class 자체에 직접 적용을 하는 방법도 있어요
 name = 을 줘야한다.
+
+
+```
+@method_decorator(login_required, name='dispatch')
+class PostListView(ListView):
+    model = Post
+    paginate_by = 10
+
+post_list = PostListView.as_view()
+```
+
+```
+class PostListView(ListView):
+    model = Post
+    paginate_by = 10
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        pass
+
+post_list = PostListView.as_view()
+```
+
+```
+class PostListView(LoginRequiredMixin, ListView):
+    model = Post
+    paginate_by = 10
+```
+
+# 010
+
+Generic date Views
+ArchiveIndexView
+YearArchiveView
+MonthArchiveView
+WeekArchiveView
+Day + ArchiveView
+공통 옵션 : allow_future = False
+
+```
+In [4]: for post in post_list:
+   ...:     year = random.choice(range(1990, 2020))
+   ...:     month = random.choice(range(1, 13))
+   ...:     post.created_at = post.created_at.replace(year=year, month=month)
+   ...:     post.save()
+   ...: 
+
+In [5]: Post.objects.all().values_list('created_at')
+Out[5]: <QuerySet [(datetime.datetime(2016, 10, 2, 19, 50, 24, 305024, tzinfo=<UTC>),), (datetime.datetime(1993, 12, 2, 19, 50, 24, 300968, tzinfo=<UTC>),), (datetime.datetime(1997, 6, 2, 19, 50, 24, 296903, tzinfo=<UTC>),), (datetime.datetime(1995, 4, 2, 19, 50, 24, 292909, tzinfo=<UTC>),), (datetime.datetime(2013, 12, 2, 19, 50, 24, 288961, tzinfo=<UTC>),), (datetime.datetime(2001, 9, 2, 19, 50, 24, 284869, tzinfo=<UTC>),), (datetime.datetime(2005, 3, 2, 19, 50, 24, 280678, tzinfo=<UTC>),), (datetime.datetime(2006, 7, 2, 19, 50, 24, 276678, tzinfo=<UTC>),), (datetime.datetime(2001, 1, 2, 19, 50, 24, 272939, tzinfo=<UTC>),), (datetime.datetime(2007, 12, 2, 19, 50, 24, 269207, tzinfo=<UTC>),), (datetime.datetime(2009, 3, 2, 19, 50, 24, 265378, tzinfo=<UTC>),), (datetime.datetime(2002, 2, 2, 19, 50, 24, 261748, tzinfo=<UTC>),), (datetime.datetime(1993, 4, 2, 19, 50, 24, 257989, tzinfo=<UTC>),), (datetime.datetime(1997, 5, 2, 19, 50, 24, 254297, tzinfo=<UTC>),), (datetime.datetime(2009, 4, 2, 19, 50, 24, 250508, tzinfo=<UTC>),), (datetime.datetime(2003, 4, 2, 19, 50, 24, 246341, tzinfo=<UTC>),), (datetime.datetime(1996, 10, 2, 19, 50, 24, 242252, tzinfo=<UTC>),), (datetime.datetime(1991, 5, 2, 19, 50, 24, 238024, tzinfo=<UTC>),), (datetime.datetime(1997, 6, 2, 19, 50, 24, 234200, tzinfo=<UTC>),), (datetime.datetime(1993, 4, 2, 19, 50, 24, 230394, tzinfo=<UTC>),), '...(remaining elements truncated)...']>
+```
+
+```
+In [7]: Post.objects.all().values_list('created_at__year', flat=True)
+Out[7]: <QuerySet [2016, 1993, 1997, 1995, 2013, 2001, 2005, 2006, 2001, 2007, 2009, 2002, 1993, 1997, 2009, 2003, 1996, 1991, 1997, 1993, '...(remaining elements truncated)...']>
+```
+```
+{% for date in date_list %}
+    {{ date|date:"" }}
+
+{% endfor %}
+```
+필터에서 제공되는 함수
+
+
+```
+class PostDetailView(DetailView):
+    model = Post
+    pk_url_kwarg = 'id'
+
+# post_detail = PostDetailView.as_view()
+# class PostDetailView(DetailView):
+#     model = Post
+#
+#     def get_queryset(self):
+#         qs = super().get_queryset()
+#         if self.request.user.is_authenticated:
+#           qs = qs.filter(is_public=True)
+#         qs = qs.filter()
+#         return qs
+
+post_detail = PostDetailView.as_view()
+
+post_archive = ArchiveIndexView.as_view(model=Post, date_field='created_at', paginate_by=10)
+post_archive_year = YearArchiveView.as_view(model=Post, date_field='created_at', make_object_list=True)
+post_archive_year_month_day = DayArchiveView.as_view(model=Post, date_field='created_at')
+
+```
+'%m'
+_archive_day.html
+
+TodayArchiveView
+
+# 011
+
+적절한 상태코드로 응답하기
+return HttpResponse(status=201)
+status_code
+200 성공
+300 요청을 마치기 위해 추가 조치
+400 클라이언트측 오류
+500 서버측 오류 발생
