@@ -340,3 +340,31 @@ status_code
 300 요청을 마치기 위해 추가 조치
 400 클라이언트측 오류
 500 서버측 오류 발생
+
+# 012
+
+URL Dispatcher
+
+from django.urls import reverse
+from django.shortcuts import resolve_url
+
+
+resolve_url('instagram:post_list', pk=100)
+
+resolve_url(post)
+rediret(post)
+라고 쓰고 싶다면
+
+```
+<a href="/instagram/{{ post.pk }}">
+    {{ post.message }}
+</a>
+<a href="{% url 'instagram:post_detail' post.pk %}">
+    {{ post.message }}
+</a>
+```
+
+get_resolve_url을 구현하면 resolve_url 에서 바로 사용한다.
+함수 존재여부를 체크하기 때문에.
+
+모델에 대해서 get_absolute_url 구현
