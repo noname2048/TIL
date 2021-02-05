@@ -484,8 +484,89 @@ get_context_data(self, **kwargs):
 
 
 
+```
 class PostCreateView(FormView):
+	form_class = PostForm
+	template_name = 'myapp/post_form.html'		
+```
 
-form_class = PostForm
 
-template_name = 'myapp/post_form.html'
+
+```
+class PostCreateView(FormView):
+	model = Post
+```
+
+모델 만 지정되고 폼클래스가 정의되지 않았을 경우에는 장고가 직접 모델폼을 만든다
+
+```
+template_name_suffix = '_form'
+```
+
+ModelFormMixin 에 get_form_class에서 모델이 정의되어있으면 참조
+
+
+
+```
+def get_form_kwargs(self):
+	kwargs = super().get_form_kwargs()
+	if hasattr(self, 'object'):
+		kwargs.update({'instance': self.object})
+	return kwargs
+```
+
+
+
+```
+# def get_succes_url 중에서
+'instagram/author/{author_id}/{iid}'.format(**post.__dict__)
+```
+
+
+
+```
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    form_class = PostForm
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.author = self.request.user
+        self.object.ip = self.request.META['REMOTE_ADDR']
+        messages.success(self.request, '포스팅을 저장했습니다.')
+        return super().form_valid(form)
+
+post_new = PostCreateView.as_view()
+```
+
+```
+class PostUpdateView(LoginRequiredMixin, UpdateView):
+    model = Post
+    form_class = PostForm
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.author = self.request.user
+        self.object.ip = self.request.META['REMOTE_ADDR']
+        messages.success(self.request, '포스팅을 수정했습니다.')
+        return super().form_valid(form)
+
+
+post_edit = PostUpdateView.as_view()
+```
+
+```
+class PostDeleteView(LoginRequiredMixin, DeleteView):
+    model = Post
+    # success_url = reverse_lazy('instagram:post_list')
+   
+   	def get_success_url(self):
+        return reverse('instagram:post_list')
+
+post_delete = PostDeleteView.as_view()
+```
+
+###### 주의 ! : reverse_lazy 를 쓰는 이유
+
+class의 초기 인자는 프로젝트가 세팅되기 전에 읽힌다. 따라서 reverse 함수가 사용되지 못한다...?
+(이해하기 어려울거라고 하셨음)
