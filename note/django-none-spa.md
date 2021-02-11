@@ -1,4 +1,4 @@
-## 001
+## 002
 
 https://2019.stateofcss.com/technologiess/css-frameworks/
 
@@ -82,4 +82,27 @@ apps = [ debug_toolbar ]
 
 middleware = ['...']
 
-## 002
+## 003
+
+모든 path  에 대해서는 re_path('') 빈문자열을 넣는다
+
+###### from django.contrib.auth import get_user_model
+
+```
+In [1]: from django.contrib.auth import get_user_model
+
+In [2]: User = get_user_model()
+
+In [3]: user = User.objects.first()
+
+In [4]: user
+Out[4]: <User: noname>
+
+In [6]: user.password = '1234'
+
+In [7]: user.set_password('1234')
+
+In [8]: user.password
+Out[8]: 'pbkdf2_sha256$216000$LUV4PV1hVoeV$yjtIYGgdenPFNlEhk6ilCuPWfN1XJtTkjbLxPKCRKpk='
+```
+
