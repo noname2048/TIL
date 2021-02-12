@@ -106,3 +106,93 @@ In [8]: user.password
 Out[8]: 'pbkdf2_sha256$216000$LUV4PV1hVoeV$yjtIYGgdenPFNlEhk6ilCuPWfN1XJtTkjbLxPKCRKpk='
 ```
 
+# 004
+
+로그인 구현
+
+* settings.py > AUTH_USER_MODLE = ""
+* AbstractUser
+* UserCreationForm
+* 
+
+## 005
+
+이메일 보내기
+
+1. SMTP (이메일을 많이 보낼경우 전문적인 서비스를 써라)
+   sendgird (5만건 무료, 1천건 월별, mailgun, mailjet, Amazon SES
+
+2. django-sendgrid-v5
+
+
+
+```
+from django.core.mail import send_mail
+send_mail("", "", "", [""], fail_siltently=False)
+```
+
+
+
+여러가지가 섞여서 SMTP 따로 구현
+
+```python
+ # models.py
+ from django.core.mail import send_mail
+ 
+ def send_welcom_email(self):
+     subject = "회원가입을 환영합니다 test"
+     content = "환영환영~"
+     sender_email = "sungwook@noname2048.dev"
+     return send_mail(subject, content, sender_email, [self.email], fail_silently=False)
+```
+
+```python
+def signup(request):
+    if request.method == "POST":
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            signed_user = form.save(commit=False)
+
+            messages.success(request, f"Welcome {signed_user.username}")
+
+            if signed_user.send_welcom_email() == 1:  # FIXME: selary 로 하기
+                next_url = request.GET.get("next", "/")
+                return redirect(next_url)
+            else:
+                form = SignupForm()
+    else:
+        form = SignupForm()
+    return render(
+        request,
+        "accounts/signup_form.html",
+        {
+            "form": form,
+        },
+    )
+```
+
+```python
+# settings.py
+try:
+    SENDGRID_API_KEY = json.load(open(SECRET_DIR))["SENDGRID_API_KEY"]
+except:
+    raise ImproperlyConfigured("SECRET_KEY NOT FOUND!")
+
+
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+
+# EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+EMAIL_HOST = "smtp.sendgrid.net"
+EMAIL_PORT = "587"
+EMAIL_HOST_USER = "apikey"
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = "sungwook.csw@noname2048.dev"
+
+```
+
+###### 가입한 서비스
+
+* sendgrid - 이메일 SMTP
+* namecheap - 도메인구매 및 메일박스관리 (POP3?)
+* porkpun
