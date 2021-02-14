@@ -196,3 +196,107 @@ DEFAULT_FROM_EMAIL = "sungwook.csw@noname2048.dev"
 * sendgrid - 이메일 SMTP
 * namecheap - 도메인구매 및 메일박스관리 (POP3?)
 * porkpun
+
+## 10
+
+PasswordChangeForm
+
+PasswordChangeView
+
+등등 으로 해결
+
+```
+class AcountLoginView(LoginView):
+    template_name = "accounts/login_form.html"
+    next_page = reverse_lazy("accounts:root") # 왜 reverse 쓰면 안되고 reverse_lazy를 써야할까
+
+```
+
+
+
+큰 실수: 
+
+django 3.1.5 버전으로 개발 중에 3.2.문서를 보고 개선된 기능에 대해 함수를 작성했다.
+
+작동하지 않는건 당연하다... (한참 삽질했다.)
+
+LoginView 에 next_page 달아보겠다고 한참...
+
+
+
+######  내가 쓴 log 는 왜 server time 이 다르게 나올까
+
+```
+logger = logging.getLogger("django.server")
+logger.info("logout!")
+```
+
+
+
+```
+[13/Feb/2021 07:16:09] "POST /accounts/login/?next=/accounts/ HTTP/1.1" 302 0
+[13/Feb/2021 07:16:09,749] logout!
+[13/Feb/2021 07:16:09] "GET /accounts/ HTTP/1.1" 200 14859
+[13/Feb/2021 07:16:12] "GET /static/bootstrap-5.0.0-beta1-dist/css/bootstrap.css.map HTTP/1.1" 304 0
+[13/Feb/2021 07:16:40,680] logout!
+[13/Feb/2021 07:16:40] "GET /accounts/ HTTP/1.1" 200 14858
+```
+
+
+
+3자리 숫자가 붙어 있다.
+
+## 11
+
+```python
+Python 3.9.1 (default, Jan 28 2021, 01:00:29) 
+Type 'copyright', 'credits' or 'license' for more information
+IPython 7.19.0 -- An enhanced Interactive Python. Type '?' for help.
+
+In [1]: Post.objects.all()
+Out[1]: <QuerySet [<Post: 하하 #태그>]>
+
+In [2]: post = _
+```
+
+언더바는 전의 결과값을 가지고 있다!
+
+```python
+def extract_tag_list(self):
+    return re.findall(r"#([a-zA-Z\dㄱ-힣]+)", self.caption)
+```
+
+소괄호로 묶으면 # 이 제거된다!~
+
+###### extract_tag_list 를 python shell 에서 실험한 내용
+
+``` ipython
+Python 3.9.1 (default, Jan 28 2021, 01:00:29) 
+Type 'copyright', 'credits' or 'license' for more information
+IPython 7.19.0 -- An enhanced Interactive Python. Type '?' for help.
+
+In [1]: post = Post.objects.first()
+
+In [2]: post.extract_tag_list()
+Out[2]: [<Tag: 태그>]
+
+In [3]: post.tag_set.all()
+Out[3]: <QuerySet []>
+
+In [4]: post.tag_set.add(*post.extract_tag_list())
+
+In [5]: post.tag_set.all()
+Out[5]: <QuerySet [<Tag: 태그>]>
+
+In [6]: 
+
+```
+
+###### save 하고 tag_set.add 하기 -> m2m field는 pk 가 실제로 필요하다!
+
+```python
+post.author = get_user(request)
+post.save()
+post.tag_set.add(*post.extract_tag_list())
+```
+
