@@ -300,3 +300,12 @@ post.save()
 post.tag_set.add(*post.extract_tag_list())
 ```
 
+## 013 유저페이지 구현
+
+re_path에 달러를 꼭 붙일것!
+
+```python
+re_path(r"^(?P<username>[\w.@+-]+)/$", views.user_page, name="user_page"), # 잘못됨
+re_path(r"^(?P<username>[\w.@+-]+)/", views.user_page, name="user_page"),
+```
+
