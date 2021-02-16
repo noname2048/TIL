@@ -309,3 +309,7 @@ re_path(r"^(?P<username>[\w.@+-]+)/$", views.user_page, name="user_page"), # 잘
 re_path(r"^(?P<username>[\w.@+-]+)/", views.user_page, name="user_page"),
 ```
 
+## 014 썸네일 구현
+
+간단하게 easy_thumbnail을 이용하여 단순히 call 로 구성
+자세히 살펴보면 thumbnail model을 만들어서 없을경우 create 를 하고 있으면 불러오는듯
