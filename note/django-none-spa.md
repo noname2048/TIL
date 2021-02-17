@@ -313,3 +313,92 @@ re_path(r"^(?P<username>[\w.@+-]+)/", views.user_page, name="user_page"),
 
 간단하게 easy_thumbnail을 이용하여 단순히 call 로 구성
 자세히 살펴보면 thumbnail model을 만들어서 없을경우 create 를 하고 있으면 불러오는듯
+
+## 015
+
+1. instagram 앱에서 index.html 구현
+
+2. 최상위 주소에서는 redircect View로 redirect 구현 instagram/index.html
+3. git mv 로 root.html을 index.html 로 변경
+4. 새포스팅쓰기 밑에 col-8 col-4 의 timeline과 sidebar 등록
+5. context processor
+6. include instagram/timeline_sidebar.html
+7. 사이드 바에 대해 img 와 rounded circle 삽입
+8. username과 name을 상하로, css 작업, d-flex, text-muted, card layout
+
+
+
+## 016
+
+referer
+
+## 019
+
+```
+❯ python manage.py makemigrations instagram
+You are trying to add the field 'created_at' with 'auto_now_add=True' to post without a default; the database needs something to populate existing rows.
+
+ 1) Provide a one-off default now (will be set on all existing rows)
+ 2) Quit, and let me add a default in models.py
+Select an option: 1
+Please enter the default value now, as valid Python
+You can accept the default 'timezone.now' by pressing 'Enter' or you can provide another value.
+The datetime and django.utils.timezone modules are available, so you can do e.g. timezone.now
+Type 'exit' to exit this prompt
+[default: timezone.now] >>> timezone.now
+Migrations for 'instagram':
+  instagram/migrations/0003_auto_20210217_0045.py
+    - Add field created_at to post
+    - Add field updated_at to post
+```
+
+```python
+class BaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+```
+
+## 020
+
+```
+# user
+# -> post.objects.filter(author=user)
+# -> user.post_set.all()
+```
+
+## 021
+
+포스팅 좋아요-취소 구현
+
+django custom tag 구현
+
+font-icon 도입
+
+## 022
+
+django humanize 필터 도입,
+
+ {% load humanize %}
+
+## 023
+
+```
+jQuery(function() {
+
+})
+```
+
+은
+
+```
+$(documnet).ready(function(){
+
+})
+```
+
+의 축약이다.
+
+jquery form plugin!
