@@ -312,3 +312,39 @@ Form 처럼 View 에서 데이터 받아오기가 가능
 
 세션인증에 관해서는 프론트엔드단을 구현하면 세션 인증은 힘들 수 있다.
 
+
+
+###### DRF의 기본개념
+
+* APIView  - 클래스 기반뷰 (django는 View 상속, rest_framework는 APIView 상속)
+
+*  @api_view 함수 기반 뷰를 위한 장식자
+
+###### APIView => Generic => Viewsets
+
+* Generic 까지는 1개의 URL을, Viewsets는 여러개의 URL을 처리한다.
+
+###### VPIView 내의 dispatch 를 살펴보면 메소드를 찾는 방법이 나와있다.
+
+* http_method_names 를 확인한뒤에 dispatch로 구현 확인
+
+generics.ListAPIView
+generics.CreateAPIView
+generics.ListCreateAPIView
+generics.DestoryAPIView
+
+###### 장식자 사용 두가지 방법
+
+* @를 통해
+* 함수 호출
+
+###### DRF의 두가지 구현 (함수, 클래스)
+
+* @api_view, ["GET", "POST"]
+
+* APIView 상속
+
+###### Readonly를 적절히 사용하자
+
+* AuthorSerializer 잘못하면 모두 정보를입력해야할 수 도 있따.
+
